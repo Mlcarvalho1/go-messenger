@@ -11,7 +11,17 @@ A boilerplate project for building web applications in Go using the Fiber framew
 ---
 
 ## Project Structure
-go-messenger/ ├── controllers/ # Contains application controllers (e.g., user controller) ├── database/ # Database config files ├── models/ # Contains application models (e.g., user model) ├── routes/ # Handles route definitions ├── services/ # Contains the business logic ├── main.go # Entry point of the application └── README.md # Project documentation
+
+    ```bash
+    go-messenger/
+    ├── controllers/               <-- Contains application controllers (e.g., user controller)
+    ├── database/                  <-- Database configuration files
+    ├── models/                    <-- Contains application models (e.g., user model)
+    ├── routes/                    <-- Handles route definitions
+    ├── services/                  <-- Contains the business logic
+    ├── main.go                    <-- Entry point of the application
+    └── README.md                  <-- Project documentation
+    ```
 
 ---
 
@@ -27,17 +37,24 @@ go-messenger/ ├── controllers/ # Contains application controllers (e.g., u
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone git@github.com:Mlcarvalho1/go-messenger.git
    cd go-messenger
    ```
+
 2. Install dependencies:
+
     ```
     go mod tidy
     ```
+
 3. Run the application:
+
     ```
     go run main.go
     ```
+
 4. Access the application:
+
     Open your browser and navigate to http://localhost:3000/user
