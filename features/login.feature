@@ -27,3 +27,8 @@ Scenario: Acionamento de “Cadastre-se”
   When o usuário “João” acionar o “botão” “Cadastre-se”
   Then o usuário “João” é enviado para a tela “cadastro”
 
+Scenario: Acionamento de “Esqueci minha senha”
+  Given o usuário “João” está na página “Login”
+  When o usuário “João” acionar o “botão” “Esqueci minha senha”
+  Then o usuário “João” é enviado para a tela “Esqueci minha senha”
+
