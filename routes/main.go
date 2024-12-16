@@ -2,33 +2,34 @@ package routes
 
 import (
 	"context"
-	"log"
-	"os"
+
+	"go.messenger/middlewares"
 
 	firebase "firebase.google.com/go"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
-	gofiberfirebaseauth "github.com/sacsand/gofiber-firebaseauth"
-	"google.golang.org/api/option"
 )
 
-func SetupRoutes(app *fiber.App) {
-	api := app.Group("/", logger.New())
+func SetupRoutes(app *fiber.App, fireApp *firebase.App) {
+	authClient, err := fireApp.Auth(context.Background())
 
-	serviceAccount, fileExi := os.LookupEnv("SERVICE_ACCOUNT_JSON")
-
-	opt := option.WithCredentialsFile(serviceAccount)
-	fireApp, _ := firebase.NewApp(context.Background(), nil, opt)
-
-	if !fileExi {
-		log.Fatalf("Please provide valid firebbase auth credential json!")
+	if err != nil {
+		panic(err)
 	}
 
-	app.Use(gofiberfirebaseauth.New(gofiberfirebaseauth.Config{
-		FirebaseApp: fireApp,
-		IgnoreUrls:  []string{"POST::/user"},
-	}))
+	api := app.Group("/", logger.New())
 
-	// Register feature-based routes
+	// Rotas abaixo deste middleware utilizam o firebase.App
+	api.Use(middlewares.FirebaseMiddleware(fireApp))
+
+	AuthRoutes(api)
+
+	app.Get("/debug", func(c *fiber.Ctx) error {
+		authHeader := c.Get("Authorization")
+		return c.SendString("Authorization Header: " + authHeader)
+	})
+	// Rotas abaixo deste middleware precisam de autenticação
+	api.Use(middlewares.FirebaseAuthMiddleware(authClient))
+
 	UserRoutes(api)
 }
