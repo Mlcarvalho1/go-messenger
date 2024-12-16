@@ -1,0 +1,29 @@
+Feature: Barra de pesquisa na Lista de Contatos
+As a: Usuário
+I want to: Pesquisar usuários por nome na lista de contatos
+So that: Eu possa rapidamente encontrar o usuário que estou procurando.
+
+Feature: Abrir informações de contato na Lista de Contatos
+As a: Usuário
+I want to: Visualizar os detalhes do perfil de um usuário quando clico em seu nome
+So that: Eu possa saber mais sobre o usuário antes de abrir uma conversa com ele.
+
+
+Feature: Ausência de usuários na Lista de Contatos
+As a: Usuário
+I want to: Ver a mensagem “não há outros usuários cadastrados” caso não haja nenhum usuário na lista de contatos
+So that: Eu entenda que a lista está vazia.
+
+Cenário 6: Busca bem-sucedida por contatos na lista de contatos através do nome
+Scenario: Busca por contatos bem-sucedida
+Given: O usuário “Guilherme” está na página “lista de contatos”
+When: clicar na barra de pesquisa
+And : digitar a sequência de dígitos “Luan”
+Then: vê uma lista com os usuários que possuem a sequência de dígitos “Luan” em algum ponto do seu nome
+
+Cenário 7: Busca mal-sucedida por contatos na lista de contatos através do nome
+Scenario: Busca por contatos mal-sucedida
+Given: O usuário “Guilherme” está na página “lista de contatos”
+When: o usuário clicar na barra de pesquisa
+And : digitar a sequência de dígitos “Luan”
+Then: vê uma lista vazia com a mensagem “Não há contatos com esse nome”
