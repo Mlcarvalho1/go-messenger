@@ -1,0 +1,56 @@
+Feature: Nova Conversa em Grupo            
+    As a: Usuário
+    I want to: Criar um novo grupo clicando em um botão acima da lista de conversas
+    So that: Eu possa iniciar uma conversa em grupo com outros usuários.
+
+Scenario: Criar grupo com mais de 1 usuário
+    Given O usuário “Luan Romancini” está na tela “criação de grupo”
+    And ve a lista de todos os usuários com checkboxes ao lado de seus nomes
+    When seleciona os usuários “matheus”
+    And seleciona os usuários “paulo”
+    And seleciona os usuários “Lucas” 
+    And clica no botão "confirmar"
+    Then vê a mensagem “inserir o nome do grupo”
+    And ve os usuários a foto de “matheus” na  tela “nome do grupo”
+    And ve os usuários a foto de “paulo” na  tela “nome do grupo”
+    And ve os usuários a foto de “Lucas” na  tela “nome do grupo”
+
+Scenario: Criar grupo com apenas 1 usuário
+    Given o usuário “Luan Romancini” na tela “criação de grupo”
+    And ve uma lista “usuários” com checkboxes ao lado de seus nomes
+    When seleciona 1 usuário na lista e tenta clicar em "confirmar"
+    Then vê que o botão "confirmar" esta desabilitado
+
+Scenario: Tentar criar grupo sem selecionar nenhum usuário
+    Given o usuário “Luan Romancini” na tela “criação de grupo”
+    When não seleciona nenhum usuário e tento clicar em "confirmar"
+    Then vê que o botão "confirmar" esta desabilitado
+
+Scenario: Nomear grupo 
+    Given o usuário "Luan  Romancini” na tela "nomear grupo"
+    And vê o espaço a preencher "Digite o nome do grupo"
+    And vê o botão confirmar
+    When escreve o nome do grupo no espaço "Digite o nome do grupo" 
+    Then um novo chat com nome "grupo Go" é aberto
+
+Feature: Integrantes da conversa em Grupo
+    As a: Usuário
+    I want to: Ver os integrantes do grupo após a criação
+    So that: Eu possa confirmar quem faz parte do grupo.
+
+Scenario: Ver integrantes de um grupo existente
+    Given o usuário “Luan Romancini” na tela “conversas”
+    And a conversa com o grupo “grupo Go” aberta
+    And ve um botão “listar integrantes”
+    When clica no botão “listar integrantes”
+    Then vê a “lista de integrantes” 
+    And vê as fotos de todos os integrantes do grupo
+    And ve um botão “fechar” na tela de “lista de integrantes”
+
+
+Scenario: Fechar lista de integrantes do grupo
+    Given o usuário “Luan Romancini” vê a “lista de integrantes” do “grupo Go” 
+    And ve um botão “fechar”
+    When clica no botão “fechar”
+    Then abre a conversa com o grupo “grupo Go”
+
