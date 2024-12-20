@@ -32,6 +32,7 @@ _,,_,*^____      _____''*g*\"*,          Welcome to go message!
 func main() {
 	app := fiber.New()
 	fireAuth := database.InitFirebaseAuth()
+	database.ConnectDb()
 
 	routes.SetupRoutes(app, fireAuth)
 
