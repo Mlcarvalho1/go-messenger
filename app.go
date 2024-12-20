@@ -31,9 +31,9 @@ _,,_,*^____      _____''*g*\"*,          Welcome to go message!
 
 func main() {
 	app := fiber.New()
-	fireApp := database.InitFirebaseApp()
+	fireAuth := database.InitFirebaseAuth()
 
-	routes.SetupRoutes(app, fireApp)
+	routes.SetupRoutes(app, fireAuth)
 
 	log.Println(gopherDraw)
 

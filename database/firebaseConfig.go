@@ -6,10 +6,11 @@ import (
 	"os"
 
 	firebase "firebase.google.com/go"
+	"firebase.google.com/go/auth"
 	"google.golang.org/api/option"
 )
 
-func InitFirebaseApp() *firebase.App {
+func InitFirebaseAuth() *auth.Client {
 	serviceAccount, fileExi := os.LookupEnv("SERVICE_ACCOUNT_JSON")
 
 	if !fileExi {
@@ -24,5 +25,11 @@ func InitFirebaseApp() *firebase.App {
 		log.Fatalf("Error initializing Firebase app: %v", err)
 	}
 
-	return app
+	authClient, err := app.Auth(context.Background())
+
+	if err != nil {
+		panic(err)
+	}
+
+	return authClient
 }

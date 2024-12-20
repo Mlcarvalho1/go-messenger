@@ -1,26 +1,16 @@
 package routes
 
 import (
-	"context"
-
+	"firebase.google.com/go/auth"
 	"go.messenger/middlewares"
 
-	firebase "firebase.google.com/go"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
-func SetupRoutes(app *fiber.App, fireApp *firebase.App) {
-	authClient, err := fireApp.Auth(context.Background())
-
-	if err != nil {
-		panic(err)
-	}
+func SetupRoutes(app *fiber.App, fireAuth *auth.Client) {
 
 	api := app.Group("/", logger.New())
-
-	// Rotas abaixo deste middleware utilizam o firebase.App
-	api.Use(middlewares.FirebaseMiddleware(fireApp))
 
 	AuthRoutes(api)
 
@@ -29,7 +19,7 @@ func SetupRoutes(app *fiber.App, fireApp *firebase.App) {
 		return c.SendString("Authorization Header: " + authHeader)
 	})
 	// Rotas abaixo deste middleware precisam de autenticação
-	api.Use(middlewares.FirebaseAuthMiddleware(authClient))
+	api.Use(middlewares.FirebaseAuthMiddleware(fireAuth))
 
 	UserRoutes(api)
 }
