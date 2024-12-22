@@ -17,3 +17,16 @@
         When o usuário preenche os campos “nome” com “Rafael Alves”, “email” com “exampleemail” e “senha” com  “senhaSegura123.” , "confirmar senha" com "senhaSegura123." e envia uma foto de perfil
         And clica no botão “criar conta”
         Then o sistema exibe uma mensagem de erro "Email inválido. Por favor, insira um email válido."
+
+    Scenario: Cadastro com email já cadastrado
+        Given o usuário está na página de “cadastro de usuário”
+        And já existe um usuário cadastrado com o email “example@email.com” no sistema
+        When o usuário preenche os campos “nome” com “Rafael Alves”, “email” com “example@email.com” e “senha” com  “senhaSegura123.”, "confirmar senha" com "senhaSegura123." e envia uma foto de perfil
+        And clica no botão “criar conta”
+        Then o sistema exibe uma mensagem de erro "O email informado já está em uso"
+
+    Scenario: Cadastro com senha Fraca
+        Given o usuário está na página de “cadastro de usuário”
+        When o usuário preenche os campos “nome” com “Rafael Alves”, “email” com “example@email.com” e “senha” com  “1234” , "confirmar senha" com "1234." e envia uma foto de perfil
+        And clica no botão “criar conta”
+        Then o sistema exibe uma mensagem de erro "Senha não cumpre os requisitos de segurança."
