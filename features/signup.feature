@@ -30,3 +30,15 @@
         When o usuário preenche os campos “nome” com “Rafael Alves”, “email” com “example@email.com” e “senha” com  “1234” , "confirmar senha" com "1234." e envia uma foto de perfil
         And clica no botão “criar conta”
         Then o sistema exibe uma mensagem de erro "Senha não cumpre os requisitos de segurança."
+
+    Scenario: Cadastro com senha e senha de confirmação diferentes
+        Given o usuário está na página de “cadastro de usuário”
+        When o usuário preenche os campos “nome” com “Rafael Alves”, “email” com “example@email.com” e “senha” com  “senhaSegura12.” , "confirmar senha" com "snhaSegura1." e envia uma foto de perfil
+        And clica no botão “criar conta”
+        Then o sistema exibe uma mensagem de erro "Senha não cumpre os requisitos de segurança."
+
+    Scenario: Cadastro sem preencher todos os campos
+        Given o usuário está na página de “cadastro de usuário”
+        When o usuário preenche os campos “email” com “example@email.com” e “senha” com  “senhaSegura12.” , "confirmar senha" com "senhaSegura12.." e envia uma foto de perfil
+        And clica no botão “criar conta”
+        Then o sistema exibe uma mensagem de erro "Todos os campos devem ser preenchidos."
