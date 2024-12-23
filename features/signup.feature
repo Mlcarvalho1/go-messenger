@@ -42,3 +42,4 @@
         When o usuário preenche os campos “email” com “example@email.com” e “senha” com  “senhaSegura12.” , "confirmar senha" com "senhaSegura12.." e envia uma foto de perfil
         And clica no botão “criar conta”
         Then o sistema exibe uma mensagem de erro "Todos os campos devem ser preenchidos."
+        Then o sistema exibe uma mensagem de erro "O campo nome é obrigatório."
