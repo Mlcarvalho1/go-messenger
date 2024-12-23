@@ -14,3 +14,4 @@ Given o usuário está no modal “Confirmação”
 When o usuário aciona o botão “Não” 
 Then a ação é cancelada
 And o usuário retorna à página anterior
+
