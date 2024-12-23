@@ -43,3 +43,11 @@
         And clica no botão “criar conta”
         Then o sistema exibe uma mensagem de erro "Todos os campos devem ser preenchidos."
         Then o sistema exibe uma mensagem de erro "O campo nome é obrigatório."
+
+    Scenario: Cadastro de usuário sem foto de perfil
+        Given o usuário está na página de “cadastro de usuário”
+        When o usuário preenche os campos "nome" com "Rafael Alves", "email" com "example@email.com", "senha" com "senhaSegura123." e "confirmar senha" com "senhaSegura123."
+        And clica no botão “criar conta”
+        Then o usuário está na página de “Confirme o seu email”
+        When o usuário confirma o email
+        Then o usuário está na página de “login
