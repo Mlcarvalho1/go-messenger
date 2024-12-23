@@ -12,6 +12,11 @@ And o usuário retorna à página anterior
 Scenario: Cancelar ação no modal de confirmação
 Given o usuário está no modal “Confirmação”
 When o usuário aciona o botão “Não” 
-Then a ação é cancelada
+Then a ação é cancelada 
 And o usuário retorna à página anterior
 
+Scenario: Confirmar exclusão de foto de perfil 
+Given o modal de confirmação está aberto
+When o usuário “Victor Mendonça” aciona o botão “Sim” 
+Then a foto de perfil é excluída 
+And a foto padrão é exibida na página “Meu Perfil”
