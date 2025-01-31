@@ -8,7 +8,5 @@ type User struct {
 	ID        uint   `json:"id"`
 	Name      string `json:"name"`
 	Email     uint   `json:"email"`
-	Password  string `json:"password"`
-	Avatar    string `json:"avatar"`
 	FireToken string `json:"fire_token"`
 }
