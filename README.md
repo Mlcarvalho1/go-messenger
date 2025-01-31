@@ -58,3 +58,17 @@ A boilerplate project for building web applications in Go using the Fiber framew
 4. Access the application:
 
     Open your browser and navigate to http://localhost:3000/user
+
+## Running tests
+
+- **Integration Tests**
+    In te terminal run:
+    ```
+        make test-integration
+    ```
+
+    To receive the coverage report in html run:
+
+    ```
+        make test-integration-report
+    ```
