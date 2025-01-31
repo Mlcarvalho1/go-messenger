@@ -10,5 +10,5 @@ func AuthRoutes(api fiber.Router) {
 	user := api.Group("/auth")
 
 	user.Post("/", controllers.Login)
-	user.Post("/sign-up", controllers.CreateUser)
+	user.Post("/sign-up", controllers.Signup)
 }
