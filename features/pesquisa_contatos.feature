@@ -6,6 +6,7 @@ Given: O usuário “Luan Romancini” está na página “lista de contatos”
 And: ve a aba de pesquisa “pesquisar por contatos”
 When: pesquisa pelo nome "João" na barra de pesquisa
 Then: vê todos os usuários cujo nome contém a string "João"
+Then: novamente incluindo Then apenas para fazer o exercício. 
 
 Cenário 2: Abrir conversa com usuário da lista de contatos que nunca troquei mensagem
 Scenario: Abrir conversa com usuário da lista de contatos
