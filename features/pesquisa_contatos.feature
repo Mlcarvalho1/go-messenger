@@ -6,3 +6,4 @@ Given: O usuário “Luan Romancini” está na página “lista de contatos”
 And: ve a aba de pesquisa “pesquisar por contatos”
 When: pesquisa pelo nome "João" na barra de pesquisa
 Then: vê todos os usuários cujo nome contém a string "João"
+Then: adicionado só para fazer o exercício do roteiro 
