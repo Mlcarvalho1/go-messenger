@@ -20,3 +20,10 @@ Given o modal de confirmação está aberto
 When o usuário “Victor Mendonça” aciona o botão “Sim” 
 Then a foto de perfil é excluída 
 And a foto padrão é exibida na página “Meu Perfil”
+And o usuário recebe uma mensagem "Foto adicionada com sucesso"
+
+Scenario: Confirmar exclusão de foto de perfil 
+Given o modal de confirmação está aberto
+When o usuário “Victor Mendonça” aciona o botão “Sim” 
+Then a foto de perfil é excluída 
+And a foto padrão é exibida na página “Meu Perfil”
