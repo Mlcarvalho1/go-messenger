@@ -3,7 +3,7 @@ As a um Usuário
 I want to ver todos os chats da aplicação que há conversas na lista de chats
 So that eu possa visualizar e interagir com os chats
 
-Scenario: Lista de chats não-vazia 
+Scenario: Lista de chats não-vazia
 Given: o usuário "Ian Melo" está na página "lista de chats"
 And: possui chats ativos
 When: está na página "lista de chats"
