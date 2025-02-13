@@ -7,6 +7,6 @@ type User struct {
 
 	ID        uint   `json:"id"`
 	Name      string `json:"name"`
-	Email     uint   `json:"email"`
+	Email     string `json:"email"`
 	FireToken string `json:"fire_token"`
 }
