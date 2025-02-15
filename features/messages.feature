@@ -25,3 +25,22 @@ Scenario: Clicar no botão de reenvio
     And a rede cai
     And eu clico no botão de reenvio
     Then a mensagem "Olá, como vai?" deve ser entregue para "Felipe torres"
+
+Schenario : Responder a uma mensagem com sucesso
+    Given eu estou na tela de conversa de um bate-papo existente
+    And há mensagens exibidas no histórico da conversa
+    When eu seleciono uma mensagem no histórico
+    And clico no ícone de "responder"
+    And digito uma nova mensagem no campo de texto
+    And clico no botão de envio
+    Then a nova mensagem é exibida no histórico, vinculada à mensagem respondida
+    And a mensagem de resposta é marcada como enviada com sucesso.
+
+Schenario: Responder uma mensagem e cancelar antes do envio
+    Given eu estou na tela de conversa de um bate-papo existente
+    And há mensagens exibidas no histórico da conversa
+    When eu seleciono uma mensagem no histórico
+    And clico no ícone de "responder"
+    And clico no botão de cancelar antes de digitar ou enviar
+    Then o sistema remove o modo de resposta
+    And o campo de texto volta ao estado inicial.
