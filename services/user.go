@@ -9,6 +9,5 @@ func GetUser() (models.User, error) {
 		ID:   1,
 		Name: "John Doe",
 	}
-
 	return user, nil
 }
