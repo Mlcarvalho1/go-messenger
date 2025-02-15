@@ -22,6 +22,10 @@ func CreateUser(payload SignupPayload) (*models.User, error) {
 		return nil, errors.New("name, email, and password are required")
 	}
 
+	if payload.PhotoURL == "" {
+		payload.PhotoURL = " "
+	}
+
 	authClient := database.InitFirebaseAuth()
 	if authClient == nil {
 		return nil, errors.New("failed to initialize Firebase auth client")
@@ -37,9 +41,6 @@ func CreateUser(payload SignupPayload) (*models.User, error) {
 
 	userRecord, err := authClient.CreateUser(context.Background(), params)
 	if err != nil {
-		if err.Error() == "auth/email-already-exists" {
-			return nil, errors.New("email already exists")
-		}
 		return nil, errors.New(err.Error())
 	}
 

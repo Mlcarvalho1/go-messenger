@@ -21,49 +21,118 @@ import (
 
 // Configura o ambiente de teste
 func setupApp() *fiber.App {
+	database.ConnectDb()
 	app := fiber.New()
 	app.Use(logger.New())
 	app.Post("/auth/sign-up", controllers.Signup)
 	return app
 }
 
-func TestSignupSuccessWithPhoto(t *testing.T) {
+func TestSignupSuccess(t *testing.T) {
 	if err := godotenv.Load(); err != nil {
 		log.Print("No .env file found")
 	}
 	app := setupApp()
+	t.Run("valid account", func(t *testing.T) {
+		SignupPayload := map[string]string{
+			"email":     "example@teste.com",
+			"password":  "12345678fgfd",
+			"photo_url": "https://example.com/photo.jpg",
+			"name":      "John Doe",
+		}
+		
+		cleanupTestUser(SignupPayload["email"]) // Limpa o usuário antes de criar um novo
 
-	loginPayload := map[string]string{
-		"email":    "teste@teste.com",
-		"password": "12345678",
-	}
-	
-	body, _ := json.Marshal(loginPayload)
+		body, _ := json.Marshal(SignupPayload)
 
-	req := httptest.NewRequest(http.MethodPost, "/auth", bytes.NewReader(body))
-	req.Header.Set("Content-Type", "application/json")
+		req := httptest.NewRequest(http.MethodPost, "/auth/sign-up", bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
 
-	resp, err := app.Test(req, -1)
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
+		resp, err := app.Test(req, -1)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+	})
 
-	// var body map[string]interface{}
+	t.Run("email already exists", func(t *testing.T) {
+		SignupPayload := map[string]string{
+			"email":     "example@teste.com",
+			"password":  "12345678fgfd",
+			"photo_url": "https://example.com/photo.jpg",
+			"name":      "John Doe",
+		}
 
-	// t.Logf("Response body: %v", body) // Log para depuração
-	
-	// // Verifica se "user" existe antes de acessar seus campos
-	// userData, ok := body["user"].(map[string]interface{})
-	// if !ok {
-	// 	t.Fatalf("Expected 'user' key in response, but got: %v", body)
-	// }
-	// json.NewDecoder(resp.Body).Decode(&body)
+		// Create user first
+		body, _ := json.Marshal(SignupPayload)
 
-	// assert.Equal(t, "User created successfully", body["message"])
-	// assert.Equal(t, "John Doe", body["user"].(map[string]interface{})["name"])
-	// assert.Equal(t, "https://example.com/photo.jpg", body["user"].(map[string]interface{})["photo"])
+		req := httptest.NewRequest(http.MethodPost, "/auth/sign-up", bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
 
-	// Cleanup: Remover usuário do Firebase e BD
-	// cleanupTestUser(userData["email"].(string))
+		// app.Test(req, -1)
+
+		// Try to create the same user again
+		resp, err := app.Test(req, -1)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	})
+
+	t.Run("weak password", func(t *testing.T) {
+		SignupPayload := map[string]string{
+			"email":     "example@teste.com",
+			"password":  "123",
+			"photo_url": "https://example.com/photo.jpg",
+			"name":      "John Doe",
+		}
+
+		// cleanupTestUser(SignupPayload["email"]) // Limpa o usuário antes de criar um novo
+
+		body, _ := json.Marshal(SignupPayload)
+
+		req := httptest.NewRequest(http.MethodPost, "/auth/sign-up", bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+
+		resp, err := app.Test(req, -1)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	})
+
+	t.Run("invalid email", func(t *testing.T) {
+		SignupPayload := map[string]string{
+			"email":     "invalid-email",
+			"password":  "12345678fgfd",
+			"photo_url": "https://example.com/photo.jpg",
+			"name":      "John Doe",
+		}
+
+		body, _ := json.Marshal(SignupPayload)
+
+		req := httptest.NewRequest(http.MethodPost, "/auth/sign-up", bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+
+		resp, err := app.Test(req, -1)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	})
+
+	t.Run("success without photo", func(t *testing.T) {
+		SignupPayload := map[string]string{
+			"email":    "example@teste.com",
+			"password": "12345678fgfd",
+			"name":     "John Doe",
+			"photo_url": "",
+		}
+
+		cleanupTestUser(SignupPayload["email"]) // Limpa o usuário antes de criar um novo
+
+		body, _ := json.Marshal(SignupPayload)
+
+		req := httptest.NewRequest(http.MethodPost, "/auth/sign-up", bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+
+		resp, err := app.Test(req, -1)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+	})
+
 }
 
 // Função para remover o usuário do Firebase e banco de dados após o teste
