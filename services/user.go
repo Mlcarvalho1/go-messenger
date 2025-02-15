@@ -12,3 +12,12 @@ func GetUser(id int) (models.User, error) {
 
 	return user, nil
 }
+
+func UpdateUser(name string, photo string) (models.User, error) {
+	user := models.User{
+		Name:   name,
+		Avatar: photo,
+	}
+
+	return user, nil
+}

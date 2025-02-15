@@ -24,3 +24,33 @@ func GetUser(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(user)
 }
+
+type UserUpdates struct {
+	Name  string `json:"name"`
+	Photo string `json:"photo"`
+}
+
+func UpdateUser(c *fiber.Ctx) error {
+
+	var updates UserUpdates
+
+	if err := c.BodyParser(&updates); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Cannot parse JSON"})
+	}
+
+	if updates.Name == "" || updates.Photo == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Name and photo cannot be empty"})
+	}
+
+	//id, err := strconv.Atoi(c.Params("id"))
+	//if err != nil {
+	//	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid user ID"})
+	//}
+
+	user, err := services.UpdateUser(updates.Name, updates.Photo)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update user"})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(user)
+}
