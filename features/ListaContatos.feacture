@@ -1,0 +1,65 @@
+Feature: Lista de Contatos
+    As a: Usuário
+    I want to: Ver todos os usuários da aplicação na lista de contatos independentemente de ter conversado com eles ou não
+    So that: Eu possa visualizar e interagir com outros usuários cadastrados.
+
+Scenario: Lista de contatos vazia
+    Given O usuário “Guilherme” está na página “lista de contatos”
+    And Não há usuários cadastrados na aplicação
+    When vê a lista “contatos”
+    Then vê a mensagem “não há outros usuários cadastrados”
+
+Scenario: Lista de contatos ordenada
+    Given O usuário “Guilherme” está na página “lista de contatos”
+    When vê a lista “contatos” ordenada por "ordem alfabética"
+    Then vê o usuário “Luan Romancini”
+
+Feature: Abrir informações de contato na Lista de Contatos
+    As a: Usuário
+    I want to: Visualizar os detalhes do perfil de um usuário quando clico em seu nome
+    So that: Eu possa saber mais sobre o usuário antes de abrir uma conversa com ele
+
+Scenario : Visualizar perfil ao clicar em um usuário
+    Given  O usuário “Luan Romancini” está na página “lista de contatos”
+    And ve o nome "Guilherme" na lista
+    When clica no nome "Guilherme"
+    Then vê as informações do perfil de "Guilherme"
+
+Feature: Conversar com usuário da Lista de Contatos
+    As a: Usuário
+    I want to: Clicar no botão “abrir conversa” para iniciar uma conversa com um usuário
+    So that: Eu possa iniciar uma conversa com um usuário com quem nunca conversei ou continuar uma conversa existente.
+
+Scenario: Abrir conversa com usuário da lista de contatos
+    Given O usuário “Luan Romancini” está na página “lista de contatos”
+    And vê o perfil do "Guilherme" aberto
+    And vê o botão "abrir chat" ao lado do perfil
+    When clica no botão "abrir conversa"
+    Then Uma aba de conversa é aberta com “Guilherme”
+    And vê uma conversa vazia com “Guilherme”
+
+Scenario: Abrir conversa que ja existiam com usuário da lista de contatos
+    Given O usuário “Luan Romancini” está na página “lista de contatos”
+    And ve o perfil do "Guilherme" aberto
+    And ve o botão "abrir conversa" ao lado do perfil
+    When clica no botão "abrir chat"
+    Then Uma aba de conversa é aberta com “Guilherme”
+    And ve as mensagens antigas na conversa existente com “Guilherme”
+
+Feature: Barra de pesquisa na Lista de Contatos
+    As a: Usuário
+    I want to: Pesquisar usuários por nome na lista de contatos
+    So that: Eu possa rapidamente encontrar o usuário que estou procurando.
+
+Scenario: Busca por contatos bem-sucedida
+    Given O usuário “Guilherme” está na página “lista de contatos”
+    When clicar na barra de pesquisa
+    And  digitar a sequência de dígitos “Luan”
+    Then vê uma lista com os usuários que possuem a sequência de dígitos “Luan” em algum ponto do seu nome
+
+Scenario: Busca por contatos mal-sucedida
+    Given O usuário “Guilherme” está na página “lista de contatos”
+    When  o usuário clicar na barra de pesquisa
+    And   digitar a sequência de dígitos “Luan”
+    Then  vê uma lista vazia com a mensagem “Não há contatos com esse nome”
+
