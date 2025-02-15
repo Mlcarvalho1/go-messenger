@@ -38,8 +38,8 @@ func UpdateUser(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Cannot parse JSON"})
 	}
 
-	if updates.Name == "" || updates.Photo == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Name and photo cannot be empty"})
+	if updates.Name == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Name cannot be empty"})
 	}
 
 	//id, err := strconv.Atoi(c.Params("id"))
