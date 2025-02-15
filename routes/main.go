@@ -22,4 +22,7 @@ func SetupRoutes(app *fiber.App, fireAuth *auth.Client) {
 	api.Use(middlewares.FirebaseAuthMiddleware(fireAuth))
 
 	UserRoutes(api)
+
+	ResetPasswordRoutes(api)
+
 }
