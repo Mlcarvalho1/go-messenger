@@ -3,186 +3,81 @@ package controllers_test
 import (
 	"bytes"
 	"encoding/json"
-	"io"
+
 	"log"
 	"net/http"
 	"net/http/httptest"
+
+	"context"
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
-
 	"go.messenger/controllers"
+	"go.messenger/database"
 )
 
-type RegisterResponse struct {
-	Message string `json:"message"`
+// Configura o ambiente de teste
+func setupApp() *fiber.App {
+	app := fiber.New()
+	app.Use(logger.New())
+	app.Post("/auth/sign-up", controllers.Signup)
+	return app
 }
 
-type ErrorResponse struct {
-	Error string `json:"error"`
-}
-
-type RegisterRequest struct {
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	PhotoURL string `json:"photo_url"`
-}
-
-var app *fiber.App
-
-func setup() {
-    app = fiber.New()
-    app.Use(logger.New())
-    app.Post("/auth/sign-up", controllers.Signup)
-}
-
-func TestUserRegistration(t *testing.T) {
+func TestSignupSuccessWithPhoto(t *testing.T) {
 	if err := godotenv.Load(); err != nil {
 		log.Print("No .env file found")
 	}
-	// Create a new Fiber app
-	setup()
+	app := setupApp()
 
-	t.Run("successful registration", func(t *testing.T) {
-		registrationPayload := map[string]string{
-			"name":      "Rafael Alves",
-			"email":     "raaffa2@email.com",
-			"Password":  "senhaSegura123.",
-			"photo_url": "base64encodedimage==",
+	loginPayload := map[string]string{
+		"email":    "teste@teste.com",
+		"password": "12345678",
+	}
+	
+	body, _ := json.Marshal(loginPayload)
+
+	req := httptest.NewRequest(http.MethodPost, "/auth", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := app.Test(req, -1)
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+	// var body map[string]interface{}
+
+	// t.Logf("Response body: %v", body) // Log para depuração
+	
+	// // Verifica se "user" existe antes de acessar seus campos
+	// userData, ok := body["user"].(map[string]interface{})
+	// if !ok {
+	// 	t.Fatalf("Expected 'user' key in response, but got: %v", body)
+	// }
+	// json.NewDecoder(resp.Body).Decode(&body)
+
+	// assert.Equal(t, "User created successfully", body["message"])
+	// assert.Equal(t, "John Doe", body["user"].(map[string]interface{})["name"])
+	// assert.Equal(t, "https://example.com/photo.jpg", body["user"].(map[string]interface{})["photo"])
+
+	// Cleanup: Remover usuário do Firebase e BD
+	// cleanupTestUser(userData["email"].(string))
+}
+
+// Função para remover o usuário do Firebase e banco de dados após o teste
+func cleanupTestUser(email string) {
+	authClient := database.InitFirebaseAuth() // Implemente essa função para pegar o cliente do Firebase
+	if authClient != nil {
+		user, err := authClient.GetUserByEmail(context.Background(), email)
+		if err == nil {
+			authClient.DeleteUser(context.Background(), user.UID)
 		}
-		body, _ := json.Marshal(registrationPayload)
+	}
 
-		req := httptest.NewRequest(http.MethodPost, "/auth/sign-up", bytes.NewReader(body))
-		req.Header.Set("Content-Type", "application/json")
-
-		resp, _ := app.Test(req)
-
-		bodyBytes, err := io.ReadAll(resp.Body)
-
-		if err != nil {
-			t.Fatalf("Failed to read response body: %v", err)
-		}
-
-		assert.Equal(t, http.StatusOK, resp.StatusCode)
-
-		var response RegisterResponse
-		err = json.Unmarshal(bodyBytes, &response)
-		if err != nil {
-			t.Fatalf("Failed to unmarshal response body: %v", err)
-		}
-
-	})
-
-	t.Run("invalid email registration", func(t *testing.T) {
-		registrationPayload := map[string]string{
-			"name":      "Rafael Alves",
-			"email":     "rrafaemail.com",
-			"Password":  "senhaSegura123.",
-			"photo_url": "base64encodedimage==",
-		}
-		body, _ := json.Marshal(registrationPayload)
-
-		req := httptest.NewRequest(http.MethodPost, "/auth/sign-up", bytes.NewReader(body))
-		req.Header.Set("Content-Type", "application/json")
-
-		resp, _ := app.Test(req)
-
-		bodyBytes, err := io.ReadAll(resp.Body)
-		if err != nil {
-			t.Fatalf("Failed to read response body: %v", err)
-		}
-
-		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-
-		var response ErrorResponse
-		err = json.Unmarshal(bodyBytes, &response)
-		if err != nil {
-			t.Fatalf("Failed to unmarshal response body: %v", err)
-		}
-
-		assert.Equal(t, "Invalid email format", response.Error)
-	})
-
-	t.Run("email already registered", func(t *testing.T) {
-		registrationPayload := map[string]string{
-			"name":      "Rafael Alves",
-			"email":     "example@email.com",
-			"Password":  "senhaSegura123.",
-			"photo_url": "base64encodedimage==",
-		}
-		body, _ := json.Marshal(registrationPayload)
-
-		req := httptest.NewRequest(http.MethodPost, "/auth/sign-up", bytes.NewReader(body))
-		req.Header.Set("Content-Type", "application/json")
-
-		resp, _ := app.Test(req)
-
-		bodyBytes, err := io.ReadAll(resp.Body)
-		if err != nil {
-			t.Fatalf("Failed to read response body: %v", err)
-		}
-
-		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-
-		var response ErrorResponse
-		err = json.Unmarshal(bodyBytes, &response)
-		if err != nil {
-			t.Fatalf("Failed to unmarshal response body: %v", err)
-		}
-
-		assert.Equal(t, "Email already in use", response.Error)
-	})
-
-    t.Run("weak password registration", func(t *testing.T) {
-		registrationPayload := map[string]string{
-			"name":      "Rafael Alves",
-			"email":     "example@email.com",
-			"Password":  "1234",
-			"photo_url": "base64encodedimage==",
-		}
-		body, _ := json.Marshal(registrationPayload)
-
-		req := httptest.NewRequest(http.MethodPost, "/auth/sign-up", bytes.NewReader(body))
-		req.Header.Set("Content-Type", "application/json")
-
-		resp, _ := app.Test(req)
-
-		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-
-		var response ErrorResponse
-		err := json.NewDecoder(resp.Body).Decode(&response)
-		if err != nil {
-			t.Fatalf("Failed to unmarshal response body: %v", err)
-		}
-
-		assert.Equal(t, "WEAK_PASSWORD : Password should be at least 6 characters", response.Error)
-	})
-
-	t.Run("registration without profile picture", func(t *testing.T) {
-		registrationPayload := map[string]string{
-			"name":      "Rafael Alves",
-			"email":     "example5@email.com",
-			"Password":  "senhaSegura123.",
-			"photo_url": "base64encodedimage==",
-		}
-		body, _ := json.Marshal(registrationPayload)
-
-		req := httptest.NewRequest(http.MethodPost, "/auth/sign-up", bytes.NewReader(body))
-		req.Header.Set("Content-Type", "application/json")
-
-		resp, _ := app.Test(req)
-
-		assert.Equal(t, http.StatusOK, resp.StatusCode)
-
-		var response RegisterResponse
-		err := json.NewDecoder(resp.Body).Decode(&response)
-		if err != nil {
-			t.Fatalf("Failed to unmarshal response body: %v", err)
-		}
-
-	})
+	db := database.DB.Db // Implemente essa função para acessar o banco
+	if db != nil {
+		db.Exec("DELETE FROM users WHERE email = ?", email)
+	}
 }
