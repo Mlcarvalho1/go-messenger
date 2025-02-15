@@ -17,7 +17,7 @@ type SignupPayload struct {
 }
 
 // CreateUser envia os dados para o Firebase e salva no banco de dados
-func CreateUser(payload SignupPayload) (*models.User, error) {
+func CreateUser(payload SignupPayload, authClient *auth.Client) (*models.User, error) {
 	if payload.Email == "" || payload.Password == "" || payload.Name == "" {
 		return nil, errors.New("name, email, and password are required")
 	}
@@ -26,7 +26,6 @@ func CreateUser(payload SignupPayload) (*models.User, error) {
 		payload.PhotoURL = " "
 	}
 
-	authClient := database.InitFirebaseAuth()
 	if authClient == nil {
 		return nil, errors.New("failed to initialize Firebase auth client")
 	}

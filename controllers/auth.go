@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 
+	"firebase.google.com/go/auth"
 	"github.com/gofiber/fiber/v2"
 	"go.messenger/services"
 )
@@ -63,14 +64,14 @@ func Login(c *fiber.Ctx) error {
 	})
 }
 
-func Signup(c *fiber.Ctx) error {
+func Signup(c *fiber.Ctx, authClient *auth.Client) error {
 	var payload services.SignupPayload
 
 	if err := c.BodyParser(&payload); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
 	}
 
-	user, err := services.CreateUser(payload)
+	user, err := services.CreateUser(payload, authClient)
 	if err != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}

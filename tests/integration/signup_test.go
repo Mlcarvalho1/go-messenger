@@ -22,9 +22,12 @@ import (
 // Configura o ambiente de teste
 func setupApp() *fiber.App {
 	database.ConnectDb()
+	fireAuth := database.InitFirebaseAuth()
 	app := fiber.New()
 	app.Use(logger.New())
-	app.Post("/auth/sign-up", controllers.Signup)
+	app.Post("auth/sign-up", func(c *fiber.Ctx) error {
+		return controllers.Signup(c, fireAuth) // Pass fireAuth to the controller
+	})
 	return app
 }
 
@@ -40,7 +43,7 @@ func TestSignupSuccess(t *testing.T) {
 			"photo_url": "https://example.com/photo.jpg",
 			"name":      "John Doe",
 		}
-		
+
 		cleanupTestUser(SignupPayload["email"]) // Limpa o usuário antes de criar um novo
 
 		body, _ := json.Marshal(SignupPayload)
@@ -115,9 +118,9 @@ func TestSignupSuccess(t *testing.T) {
 
 	t.Run("success without photo", func(t *testing.T) {
 		SignupPayload := map[string]string{
-			"email":    "example@teste.com",
-			"password": "12345678fgfd",
-			"name":     "John Doe",
+			"email":     "example@teste.com",
+			"password":  "12345678fgfd",
+			"name":      "John Doe",
 			"photo_url": "",
 		}
 
