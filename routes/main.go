@@ -12,7 +12,7 @@ func SetupRoutes(app *fiber.App, fireAuth *auth.Client) {
 
 	api := app.Group("/", logger.New())
 
-	AuthRoutes(api)
+	AuthRoutes(api, fireAuth)
 
 	app.Get("/debug", func(c *fiber.Ctx) error {
 		authHeader := c.Get("Authorization")

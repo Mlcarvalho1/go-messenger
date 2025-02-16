@@ -7,7 +7,9 @@ import (
 	"net/http"
 	"os"
 
+	"firebase.google.com/go/auth"
 	"github.com/gofiber/fiber/v2"
+	"go.messenger/services"
 )
 
 type LoginRequest struct {
@@ -59,5 +61,28 @@ func Login(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"token": firebaseResponse.IDToken,
+	})
+}
+
+func Signup(c *fiber.Ctx, authClient *auth.Client) error {
+	var payload services.SignupPayload
+
+	if err := c.BodyParser(&payload); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+
+	user, err := services.CreateUser(payload, authClient)
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "User created successfully",
+		"user": fiber.Map{
+			"id":    user.ID,
+			"name":  user.Name,
+			"email": user.Email,
+			"photo": user.Avatar,
+		},
 	})
 }
