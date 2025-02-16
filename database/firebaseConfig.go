@@ -7,7 +7,8 @@ import (
 
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
-	"go.messenger/controllers"
+
+	common "go.messenger/Common"
 	"google.golang.org/api/option"
 )
 
@@ -32,7 +33,7 @@ func InitFirebaseAuth() *auth.Client {
 		panic(err)
 	}
 
-	controllers.FireAuth = authClient
+	common.FireAuth = authClient
 
 	return authClient
 }

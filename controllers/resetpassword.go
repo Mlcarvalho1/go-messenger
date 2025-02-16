@@ -5,17 +5,18 @@ import (
 	"os"
 	"regexp"
 
-	"firebase.google.com/go/auth"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
+	common "go.messenger/Common"
+	"go.messenger/services"
 )
 
 type PasswordResetRequest struct {
 	Email string `json:"email"`
 }
 
-var FireAuth *auth.Client
+//var FireAuth *auth.Client
 
 func isValidEmail(email string) bool {
 	// Expressão regular para validar o formato do email
@@ -55,7 +56,15 @@ func PasswordReset(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid email format"})
 	}
 
-	authClient := FireAuth // Reuse the initialized Firebase Auth client
+	authClient := common.FireAuth // Reuse the initialized Firebase Auth client
+
+	result := services.GetEmail(request.Email)
+
+	if !result {
+		return c.JSON(fiber.Map{
+			"message": "Password reset link sent",
+		})
+	}
 
 	link, err := authClient.PasswordResetLink(c.Context(), request.Email)
 	if err != nil {
