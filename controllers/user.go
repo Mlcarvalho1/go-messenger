@@ -34,6 +34,8 @@ type UserUpdates struct {
 
 func UpdateUser(c *fiber.Ctx) error {
 
+	database.ConnectDb()
+
 	var updates UserUpdates
 
 	if err := c.BodyParser(&updates); err != nil {
@@ -60,7 +62,7 @@ func UpdateUser(c *fiber.Ctx) error {
 	}
 
 	if err := database.DB.Db.Save(&user).Error; err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update user"})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update user2"})
 	}
 
 	return c.Status(fiber.StatusOK).JSON(user)
