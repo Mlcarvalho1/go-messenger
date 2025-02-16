@@ -9,6 +9,10 @@ import (
 
 func ChatsRoutes(api fiber.Router) {
 	chats := api.Group("/chats")
+
+	// returns all chats where a user is involved
+	chats.GetChatsByUserID("/user/:userId", controllers.GetChatByUserId)
+	
 	websocketServer := websockets.NewWebSocket()
 
 	chats.Get("/", websocket.New(func(ctx *websocket.Conn) {
