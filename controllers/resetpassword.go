@@ -61,7 +61,7 @@ func PasswordReset(c *fiber.Ctx) error {
 	result := services.GetEmail(request.Email)
 
 	if !result {
-		return c.JSON(fiber.Map{
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{
 			"message": "Password reset link sent",
 		})
 	}
@@ -75,7 +75,7 @@ func PasswordReset(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to send password reset email")
 	}
 
-	return c.JSON(fiber.Map{
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Password reset link sent",
 	})
 }
