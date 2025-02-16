@@ -25,7 +25,7 @@ func FirebaseAuthMiddleware(authClient *auth.Client) fiber.Handler {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid or expired token"})
 		}
 
-		c.Locals("meta", token)
+		c.Locals("firebaseId", token.UID)
 
 		return c.Next()
 	}
