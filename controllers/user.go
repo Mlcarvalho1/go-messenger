@@ -54,7 +54,7 @@ func UpdateUser(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "User not found"})
 	}
 
-	user, err := services.UpdateUser(updates.Photo, updates.Name)
+	user, err := services.UpdateUser(updates.Name, updates.Photo)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update user"})
 	}
