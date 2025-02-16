@@ -2,6 +2,7 @@ package services
 
 import (
 	"go.messenger/models"
+    "go.messenger/database"
 )
 
 func GetChatsByUserID(userId int) ([]models.Chat, error) {
