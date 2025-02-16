@@ -1,18 +1,17 @@
 package models
 
-import (
-	"time"
-
-	"gorm.io/gorm"
-)
+import "gorm.io/gorm"
 
 type User struct {
 	gorm.Model
+	Name      string `json:"name"`
+	Email     string `json:"email" gorm:"unique"`
+	Password  string `json:"-"` // Hidden from JSON
+	Avatar    string `json:"avatar,omitempty"`
+	FireToken string `json:"fire_token,omitempty"`
 
-	ID        uint      `json:"id" gorm:"primaryKey"`
-	Name      string    `json:"name" gorm:"not null"`
-	Email     string    `json:"email" gorm:"unique;not null"`
-	FireToken string    `json:"fire_token"`
-	CreatedAt time.Time `json:"created_at" gorm:"not null"`
-	UpdatedAt time.Time `json:"updated_at" gorm:"not null"`
+	// Override gorm.Model fields to exclude them from JSON response
+	CreatedAt string `json:"created_at,omitempty" gorm:"-"`
+	UpdatedAt string `json:"updated_at,omitempty" gorm:"-"`
+	DeletedAt string `json:"deleted_at,omitempty" gorm:"-"`
 }
