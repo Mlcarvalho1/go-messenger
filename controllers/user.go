@@ -5,6 +5,8 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"go.messenger/database"
+	"go.messenger/models"
 	"go.messenger/services"
 )
 
@@ -42,13 +44,22 @@ func UpdateUser(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Name cannot be empty"})
 	}
 
-	//id, err := strconv.Atoi(c.Params("id"))
-	//if err != nil {
-	//	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid user ID"})
-	//}
+	firebaseId := c.Locals("firebaseId")
 
-	user, err := services.UpdateUser(updates.Name, updates.Photo)
+	var user models.User
+
+	result := database.DB.Db.First(&user, "fire_token = ?", firebaseId)
+
+	if result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "User not found"})
+	}
+
+	user, err := services.UpdateUser(updates.Photo, updates.Name)
 	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update user"})
+	}
+
+	if err := database.DB.Db.Save(&user).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update user"})
 	}
 

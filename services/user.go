@@ -19,7 +19,8 @@ func GetUser(id int) (models.User, error) {
 }
 
 func UpdateUser(name string, photo string) (models.User, error) {
-	user := models.User{
+	var user models.User
+	user = models.User{
 		Name:   name,
 		Avatar: photo,
 	}
