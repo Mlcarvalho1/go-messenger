@@ -21,5 +21,6 @@ func SetupRoutes(app *fiber.App, fireAuth *auth.Client) {
 	// Rotas abaixo deste middleware precisam de autenticação
 	api.Use(middlewares.FirebaseAuthMiddleware(fireAuth))
 
+	ChatsRoutes(api)
 	UserRoutes(api)
 }
