@@ -13,7 +13,7 @@ type Chat struct {
 	ID         uint           `json:"id" gorm:"primaryKey"`
 	UserID     uint           `json:"user_id" gorm:"not null"`
 	User       User           `json:"user" gorm:"foreignKey:UserID"`
-	ReceiverID uint           `json:"receiver_id"`
+	ReceiverID uint           `json:"receiver_id" gorm:"not null"`
 	Receiver   User           `json:"receiver" gorm:"foreignKey:ReceiverID"`
 	GroupID    *uint          `json:"group_id"`
 	Group      *Group         `json:"group" gorm:"foreignKey:GroupID"`

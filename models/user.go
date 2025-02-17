@@ -13,8 +13,6 @@ type User struct {
 	Avatar    string `json:"avatar,omitempty"`
 	FireToken string `json:"fire_token,omitempty"`
 
-	GroupMembers []GroupMember `json:"group_members" gorm:"foreignKey:ID"`
-
 	// Override gorm.Model fields to exclude them from JSON response
 	CreatedAt string `json:"created_at,omitempty" gorm:"-"`
 	UpdatedAt string `json:"updated_at,omitempty" gorm:"-"`
