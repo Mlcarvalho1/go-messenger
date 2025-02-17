@@ -14,6 +14,8 @@ func SetupRoutes(app *fiber.App, fireAuth *auth.Client) {
 
 	AuthRoutes(api, fireAuth)
 
+	ResetPasswordRoutes(api)
+
 	app.Get("/debug", func(c *fiber.Ctx) error {
 		authHeader := c.Get("Authorization")
 		return c.SendString("Authorization Header: " + authHeader)
@@ -21,5 +23,7 @@ func SetupRoutes(app *fiber.App, fireAuth *auth.Client) {
 	// Rotas abaixo deste middleware precisam de autenticação
 	api.Use(middlewares.FirebaseAuthMiddleware(fireAuth))
 
+	ChatsRoutes(api)
 	UserRoutes(api)
+	GroupRoutes(api)
 }
