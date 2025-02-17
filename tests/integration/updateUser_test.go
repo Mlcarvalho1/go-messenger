@@ -26,7 +26,7 @@ func setupApp3() *fiber.App {
 	app := fiber.New()
 	app.Use(logger.New())
 	app.Post("/auth", controllers.Login)
-	app.Patch("/user", middlewares.FakeFirebaseAuth("fake-firebase-id-for-test20"), controllers.UpdateUser)
+	app.Patch("/user", middlewares.FakeFirebaseAuth("fake-firebase-id-for-test2025"), controllers.UpdateUser)
 	return app
 }
 
@@ -36,13 +36,14 @@ func TestUpdateUser(t *testing.T) {
 	t.Run("valid user update", func(t *testing.T) {
 		// Cria o usuário no banco de dados real (sem transação, para ser visível)
 		user := models.User{
-			FireToken: "fake-firebase-id-for-test20",
-			Email:     "teste20@gmail.com",
+			FireToken: "fake-firebase-id-for-test2025",
+			Email:     "test2025@gmail.com",
+			Password:  "12345678",
 			Name:      "Old Name",
 			Avatar:    "https://example.com/old-photo.jpg",
 		}
 		database.DB.Db.Create(&user)
-		defer database.DB.Db.Delete(&user) // Limpeza
+		defer database.DB.Db.Delete(&user)
 
 		updates := controllers.UserUpdates{
 			Name:  "New Name",
@@ -52,7 +53,7 @@ func TestUpdateUser(t *testing.T) {
 
 		req := httptest.NewRequest(http.MethodPatch, "/user", bytes.NewReader(body))
 		req.Header.Set("Content-Type", "application/json")
-		req.Header.Set("Authorization", "Bearer fake-firebase-id-for-test20")
+		req.Header.Set("Authorization", "Bearer fake-firebase-id-for-test2025")
 
 		resp, err := app.Test(req, -1)
 
@@ -60,7 +61,7 @@ func TestUpdateUser(t *testing.T) {
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 
 		var updatedUser models.User
-		database.DB.Db.First(&updatedUser, "fire_token = ?", "fake-firebase-id-for-test20")
+		database.DB.Db.First(&updatedUser, "fire_token = ?", "fake-firebase-id-for-test2025")
 
 		assert.Equal(t, updates.Name, updatedUser.Name)
 		assert.Equal(t, updates.Photo, updatedUser.Avatar)
@@ -85,8 +86,9 @@ func TestUpdateUser(t *testing.T) {
 
 	t.Run("update with no name", func(t *testing.T) {
 		user := models.User{
-			FireToken: "fake-firebase-id-for-test20",
-			Email:     "teste21@gmail.com",
+			FireToken: "fake-firebase-id-for-test2025",
+			Email:     "teste209@gmail.com",
+			Password:  "12345678",
 			Name:      "Old Name",
 			Avatar:    "https://example.com/old-photo.jpg",
 		}
@@ -101,7 +103,7 @@ func TestUpdateUser(t *testing.T) {
 
 		req := httptest.NewRequest(http.MethodPatch, "/user", bytes.NewReader(body))
 		req.Header.Set("Content-Type", "application/json")
-		req.Header.Set("Authorization", "Bearer fake-firebase-id-for-test20")
+		req.Header.Set("Authorization", "Bearer fake-firebase-id-for-test2025")
 
 		resp, err := app.Test(req, -1)
 
