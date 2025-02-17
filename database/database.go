@@ -42,6 +42,8 @@ func ConnectDb() {
 	log.Println("running migrations")
 	db.AutoMigrate(&models.User{})
 	db.AutoMigrate(&models.Chat{})
+	db.AutoMigrate(&models.Group{})
+	db.AutoMigrate(&models.GroupMember{})
 
 	DB = Dbinstance{
 		Db: db,

@@ -14,6 +14,8 @@ func SetupRoutes(app *fiber.App, fireAuth *auth.Client) {
 
 	AuthRoutes(api, fireAuth)
 
+	ResetPasswordRoutes(api)
+
 	app.Get("/debug", func(c *fiber.Ctx) error {
 		authHeader := c.Get("Authorization")
 		return c.SendString("Authorization Header: " + authHeader)
@@ -23,4 +25,5 @@ func SetupRoutes(app *fiber.App, fireAuth *auth.Client) {
 
 	ChatsRoutes(api)
 	UserRoutes(api)
+	GroupRoutes(api)
 }

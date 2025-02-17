@@ -20,4 +20,5 @@ func ChatsRoutes(api fiber.Router) {
 	}))
 
 	go websocketServer.HandleMessages()
+
 }
