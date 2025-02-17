@@ -20,7 +20,7 @@ import (
 )
 
 // Configura o ambiente de teste
-func setupApp() *fiber.App {
+func setupAppSignup() *fiber.App {
 	database.ConnectDb()
 	fireAuth := database.InitFirebaseAuth()
 	
@@ -36,6 +36,7 @@ func TestSignup(t *testing.T) {
 	if err := godotenv.Load(); err != nil {
 		log.Print("No .env file found")
 	}
+
 	app := setupApp()
 	t.Run("success signup", func(t *testing.T) {
 		SignupPayload := map[string]string{
