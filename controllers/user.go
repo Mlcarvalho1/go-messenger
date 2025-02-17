@@ -12,11 +12,8 @@ import (
 
 func GetUser(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
-
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": fmt.Sprintf("Invalid user ID: %v", err.Error()),
-		})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid user ID"})
 	}
 
 	user, err := services.GetUser(id)
@@ -45,12 +42,15 @@ func UpdateUser(c *fiber.Ctx) error {
 	}
 
 	firebaseId := c.Locals("firebaseId")
+	fmt.Println("firebaseId:", firebaseId)
 
 	var user models.User
 
 	result := database.DB.Db.First(&user, "fire_token = ?", firebaseId)
+	fmt.Println("User found:", user)
 
 	if result.Error != nil {
+		fmt.Println("Error finding user:", result.Error)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "User not found"})
 	}
 
