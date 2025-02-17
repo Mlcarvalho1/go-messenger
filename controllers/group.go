@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/gofiber/fiber/v2"
 	"go.messenger/services"
+	"strconv"
 )
 
 func CreateGroup(ctx *fiber.Ctx) error {
@@ -21,4 +22,20 @@ func CreateGroup(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.Status(fiber.StatusCreated).JSON(group)
+}
+func GetGroupChatsByUserID(c *fiber.Ctx) error {
+	userIdStr := c.Params("userId")
+	userId, err := strconv.Atoi(userIdStr)
+	if err != nil {
+        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid user ID"})
+    }
+
+    chats, err := services.GetGroupChatsByUserID(userId)
+    if err != nil {
+        return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+            "error": "Group chats not found",
+        })
+    }
+
+    return c.Status(fiber.StatusOK).JSON(chats)
 }

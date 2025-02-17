@@ -20,7 +20,7 @@ import (
 )
 
 
-func setupApp() *fiber.App {
+func setupAppChats() *fiber.App {
     if err := godotenv.Load(); err != nil {
 		log.Print("No .env file found")
 	}
@@ -40,7 +40,7 @@ func setupApp() *fiber.App {
 }
 func TestGetChatsByUserID(t *testing.T) {
 
-    app := setupApp()
+    app := setupAppChats()
     t.Run("valid user ID with chats", func(t *testing.T) {
         // Create a user and chats in the database for testing
         email := "testuser" + strconv.FormatInt(time.Now().UnixNano(), 10) + "@test.com"

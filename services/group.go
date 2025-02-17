@@ -46,3 +46,21 @@ func CreateGroup(req CreateGroupRequest) (*models.Group, error) {
 
 	return group, nil
 }
+
+func GetGroupChatsByUserID(userID int) ([]models.Group, error) {
+    var groups []models.Group
+
+    // Subconsulta para encontrar os grupos em que o usuário é membro
+    subQuery := database.DB.Db.Model(&models.GroupMember{}).Select("group_id").Where("user_id = ?", userID)
+	if(subQuery.Error != nil) {
+		return nil, subQuery.Error
+	}
+
+    // Buscar os grupos usando a subconsulta
+    result := database.DB.Db.Where("id IN (?)", subQuery).Preload("GroupMembers").Preload("GroupMembers.User").Find(&groups)
+    if result.Error != nil {
+        return nil, result.Error
+    }
+
+    return groups, nil
+}

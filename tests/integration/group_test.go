@@ -34,45 +34,62 @@ func setupAppGroupChats() *fiber.App {
 
     // Setup routes
     api := app.Group("/api")
-    routes.ChatsRoutes(api)
+    routes.GroupRoutes(api)
 
     return app
 }
 func TestGetGroupChatsByUserID(t *testing.T) {
-
     app := setupAppGroupChats()
     t.Run("valid user ID with group chats", func(t *testing.T) {
-        // Create a user and chats in the database for testing
-        email := "testuser" + strconv.FormatInt(time.Now().UnixNano(), 10) + "@test.com"
-        user := models.User{Name: "Testador", Email: email}
-        result := database.DB.Db.Create(&user)
+         // Create a user in the database for testing
+         email := "testuser" + strconv.FormatInt(time.Now().UnixNano(), 10) + "@test.com"
+         user := models.User{Name: "Testador", Email: email}
+         result := database.DB.Db.Create(&user)
+         if result.Error != nil {
+             t.Fatalf("Failed to create user: %v", result.Error)
+         }
+ 
+         // Ensure the user ID is set
+         if user.ID == 0 {
+             t.Fatalf("User ID is not set")
+         }
+ 
+         // Create a group and link it with the user
+         group := models.Group{Name: "Test Group123", Description: "A test group123"}
+         result = database.DB.Db.Create(&group)
+         if result.Error != nil {
+             t.Fatalf("Failed to create group: %v", result.Error)
+         }
+ 
+         // Ensure the group ID is set
+         if group.ID == 0 {
+             t.Fatalf("Group ID is not set")
+         }
+
+         // Link the user with the group by creating a group member
+        groupMember := models.GroupMember{GroupID: group.ID, UserID: user.ID}
+        result = database.DB.Db.Create(&groupMember)
         if result.Error != nil {
-            t.Fatalf("Failed to create user: %v", result.Error)
+            t.Fatalf("Failed to create group member: %v", result.Error)
         }
 
-        chat := models.Chat{UserID: user.ID, ReceiverID: user.ID}
-        result = database.DB.Db.Create(&chat)
-        if result.Error != nil {
-            t.Fatalf("Failed to create chat: %v", result.Error)
-        }
-
-        req := httptest.NewRequest(http.MethodGet, "/api/chats/user/"+strconv.Itoa(int(user.ID)), nil)
+        req := httptest.NewRequest(http.MethodGet, "/api/groups/user/"+strconv.Itoa(int(user.ID)), nil)
         resp, _ := app.Test(req)
 
         assert.Equal(t, http.StatusOK, resp.StatusCode)
 
-        var chats []models.Chat
-        err := json.NewDecoder(resp.Body).Decode(&chats)
+        var groups []models.Group
+        err := json.NewDecoder(resp.Body).Decode(&groups)
         if err != nil {
             t.Fatalf("Failed to decode response body: %v", err)
         }
 
-        assert.NotEmpty(t, chats)
-        assert.Equal(t, user.ID, chats[0].UserID)
+        assert.NotEmpty(t, groups)
+        assert.Equal(t, user.ID, groups[0].GroupMembers[0].UserID)
     })
 
     t.Run("valid user ID without group chats", func(t *testing.T) {
-        // Create a user without chats in the database for testing
+        // Create a user without groups in the database for testing
         email := "testuser" + strconv.FormatInt(time.Now().UnixNano(), 10) + "@test.com"
         user := models.User{Name: "Testador", Email: email}
         result := database.DB.Db.Create(&user)
@@ -80,29 +97,29 @@ func TestGetGroupChatsByUserID(t *testing.T) {
             t.Fatalf("Failed to create user: %v", result.Error)
         }
 
-        req := httptest.NewRequest(http.MethodGet, "/api/chats/user/"+strconv.Itoa(int(user.ID)), nil)
+        req := httptest.NewRequest(http.MethodGet, "/api/groups/user/"+strconv.Itoa(int(user.ID)), nil)
         resp, _ := app.Test(req)
 
         assert.Equal(t, http.StatusOK, resp.StatusCode)
 
-        var chats []models.Chat
-        err := json.NewDecoder(resp.Body).Decode(&chats)
+        var groups []models.Group
+        err := json.NewDecoder(resp.Body).Decode(&groups)
         if err != nil {
             t.Fatalf("Failed to decode response body: %v", err)
         }
 
-        assert.Empty(t, chats)
+        assert.Empty(t, groups)
     })
    
     t.Run("invalid user ID", func(t *testing.T) {
-        req := httptest.NewRequest(http.MethodGet, "/api/chats/user/invalid", nil)
+        req := httptest.NewRequest(http.MethodGet, "/api/groups/user/invalid", nil)
         resp, _ := app.Test(req)
 
         assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
     })
 
     t.Run("non-existent user ID", func(t *testing.T) {
-        req := httptest.NewRequest(http.MethodGet, "/api/chats/user/999999", nil)
+        req := httptest.NewRequest(http.MethodGet, "/api/groups/user/999999", nil)
         resp, _ := app.Test(req)
 
         assert.Equal(t, http.StatusOK, resp.StatusCode)
