@@ -25,5 +25,5 @@ func SetupRoutes(app *fiber.App, fireAuth *auth.Client) {
 
 	ChatsRoutes(api)
 	UserRoutes(api)
-
+	GroupRoutes(api)
 }

@@ -63,3 +63,12 @@ func UpdateUser(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(user)
 }
+
+func GetUsers(c *fiber.Ctx) error {
+	contacts, err := services.GetUsers()
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Contacts not found"})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(contacts)
+}
