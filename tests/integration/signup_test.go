@@ -23,7 +23,7 @@ import (
 func setupAppSignup() *fiber.App {
 	database.ConnectDb()
 	fireAuth := database.InitFirebaseAuth()
-	
+
 	app := fiber.New()
 	app.Use(logger.New())
 	app.Post("auth/sign-up", func(c *fiber.Ctx) error {
@@ -37,7 +37,7 @@ func TestSignup(t *testing.T) {
 		log.Print("No .env file found")
 	}
 
-	app := setupApp()
+	app := setupAppSignup()
 	t.Run("success signup", func(t *testing.T) {
 		SignupPayload := map[string]string{
 			"email":     "example@teste.com",
