@@ -2,7 +2,7 @@ package controllers_test
 
 import (
 	"encoding/json"
-	"log"
+	//"log"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -11,17 +11,18 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
-	"github.com/joho/godotenv"
+	//"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 
 	"go.messenger/database"
 	"go.messenger/models"
-	"go.messenger/routes"
+    "go.messenger/controllers"
+	//"go.messenger/routes"
 )
 
 func setupApp() *fiber.App {
 	database.ConnectDb()
-	fireAuth := database.InitFirebaseAuth()
+	//fireAuth := database.InitFirebaseAuth()
 	app := fiber.New()
 	app.Use(logger.New())
 	app.Get("/users", func(c *fiber.Ctx) error {
