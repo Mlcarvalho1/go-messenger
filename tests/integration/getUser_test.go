@@ -30,7 +30,7 @@ func TestGetUser(t *testing.T) {
 	app := setupApp2()
 
 	t.Run("valid user ID", func(t *testing.T) {
-		req := httptest.NewRequest(http.MethodGet, "/user/125", nil)
+		req := httptest.NewRequest(http.MethodGet, "/user/1", nil)
 		resp, err := app.Test(req, -1)
 
 		assert.NoError(t, err)

@@ -42,7 +42,6 @@ func UpdateUser(c *fiber.Ctx) error {
 	}
 
 	firebaseId := c.Locals("firebaseId")
-	fmt.Println("firebaseId:", firebaseId)
 
 	var user models.User
 

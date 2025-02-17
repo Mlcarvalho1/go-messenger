@@ -11,6 +11,6 @@ func GroupRoutes(api fiber.Router) {
 
 	// returns all group chats where a user is involved
 	groups.Get("/user/:userId", controllers.GetGroupChatsByUserID)
-	
+
 	groups.Post("/", controllers.CreateGroup)
 }

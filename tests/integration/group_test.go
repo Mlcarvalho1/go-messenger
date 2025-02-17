@@ -19,117 +19,116 @@ import (
 	"go.messenger/routes"
 )
 
-
 func setupAppGroupChats() *fiber.App {
-    if err := godotenv.Load(); err != nil {
+	if err := godotenv.Load(); err != nil {
 		log.Print("No .env file found")
 	}
 
-    // Initialize the database (assuming you have a function to do this)
-    database.ConnectDb()
+	// Initialize the database (assuming you have a function to do this)
+	database.ConnectDb()
 
-    // Create a new Fiber app
-    app := fiber.New()
-    app.Use(logger.New())
+	// Create a new Fiber app
+	app := fiber.New()
+	app.Use(logger.New())
 
-    // Setup routes
-    api := app.Group("/api")
-    routes.GroupRoutes(api)
+	// Setup routes
+	api := app.Group("/api")
+	routes.GroupRoutes(api)
 
-    return app
+	return app
 }
 func TestGetGroupChatsByUserID(t *testing.T) {
-    app := setupAppGroupChats()
-    t.Run("valid user ID with group chats", func(t *testing.T) {
-         // Create a user in the database for testing
-         email := "testuser" + strconv.FormatInt(time.Now().UnixNano(), 10) + "@test.com"
-         user := models.User{Name: "Testador", Email: email}
-         result := database.DB.Db.Create(&user)
-         if result.Error != nil {
-             t.Fatalf("Failed to create user: %v", result.Error)
-         }
- 
-         // Ensure the user ID is set
-         if user.ID == 0 {
-             t.Fatalf("User ID is not set")
-         }
- 
-         // Create a group and link it with the user
-         group := models.Group{Name: "Test Group123", Description: "A test group123"}
-         result = database.DB.Db.Create(&group)
-         if result.Error != nil {
-             t.Fatalf("Failed to create group: %v", result.Error)
-         }
- 
-         // Ensure the group ID is set
-         if group.ID == 0 {
-             t.Fatalf("Group ID is not set")
-         }
+	app := setupAppGroupChats()
+	t.Run("valid user ID with group chats", func(t *testing.T) {
+		// Create a user in the database for testing
+		email := "testuser" + strconv.FormatInt(time.Now().UnixNano(), 10) + "@test.com"
+		user := models.User{Name: "Testador", Email: email}
+		result := database.DB.Db.Create(&user)
+		if result.Error != nil {
+			t.Fatalf("Failed to create user: %v", result.Error)
+		}
 
-         // Link the user with the group by creating a group member
-        groupMember := models.GroupMember{GroupID: group.ID, UserID: user.ID}
-        result = database.DB.Db.Create(&groupMember)
-        if result.Error != nil {
-            t.Fatalf("Failed to create group member: %v", result.Error)
-        }
+		// Ensure the user ID is set
+		if user.ID == 0 {
+			t.Fatalf("User ID is not set")
+		}
 
-        req := httptest.NewRequest(http.MethodGet, "/api/groups/user/"+strconv.Itoa(int(user.ID)), nil)
-        resp, _ := app.Test(req)
+		// Create a group and link it with the user
+		group := models.Group{Name: "Test Group123", Description: "A test group123"}
+		result = database.DB.Db.Create(&group)
+		if result.Error != nil {
+			t.Fatalf("Failed to create group: %v", result.Error)
+		}
 
-        assert.Equal(t, http.StatusOK, resp.StatusCode)
+		// Ensure the group ID is set
+		if group.ID == 0 {
+			t.Fatalf("Group ID is not set")
+		}
 
-        var groups []models.Group
-        err := json.NewDecoder(resp.Body).Decode(&groups)
-        if err != nil {
-            t.Fatalf("Failed to decode response body: %v", err)
-        }
+		// Link the user with the group by creating a group member
+		groupMember := models.GroupMember{GroupID: group.ID, UserID: user.ID}
+		result = database.DB.Db.Create(&groupMember)
+		if result.Error != nil {
+			t.Fatalf("Failed to create group member: %v", result.Error)
+		}
 
-        assert.NotEmpty(t, groups)
-        assert.Equal(t, user.ID, groups[0].GroupMembers[0].UserID)
-    })
+		req := httptest.NewRequest(http.MethodGet, "/api/groups/user/"+strconv.Itoa(int(user.ID)), nil)
+		resp, _ := app.Test(req)
 
-    t.Run("valid user ID without group chats", func(t *testing.T) {
-        // Create a user without groups in the database for testing
-        email := "testuser" + strconv.FormatInt(time.Now().UnixNano(), 10) + "@test.com"
-        user := models.User{Name: "Testador", Email: email}
-        result := database.DB.Db.Create(&user)
-        if result.Error != nil {
-            t.Fatalf("Failed to create user: %v", result.Error)
-        }
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
 
-        req := httptest.NewRequest(http.MethodGet, "/api/groups/user/"+strconv.Itoa(int(user.ID)), nil)
-        resp, _ := app.Test(req)
+		var groups []models.Group
+		err := json.NewDecoder(resp.Body).Decode(&groups)
+		if err != nil {
+			t.Fatalf("Failed to decode response body: %v", err)
+		}
 
-        assert.Equal(t, http.StatusOK, resp.StatusCode)
+		assert.NotEmpty(t, groups)
+		assert.Equal(t, user.ID, groups[0].GroupMembers[0].UserID)
+	})
 
-        var groups []models.Group
-        err := json.NewDecoder(resp.Body).Decode(&groups)
-        if err != nil {
-            t.Fatalf("Failed to decode response body: %v", err)
-        }
+	t.Run("valid user ID without group chats", func(t *testing.T) {
+		// Create a user without groups in the database for testing
+		email := "testuser" + strconv.FormatInt(time.Now().UnixNano(), 10) + "@test.com"
+		user := models.User{Name: "Testador", Email: email}
+		result := database.DB.Db.Create(&user)
+		if result.Error != nil {
+			t.Fatalf("Failed to create user: %v", result.Error)
+		}
 
-        assert.Empty(t, groups)
-    })
-   
-    t.Run("invalid user ID", func(t *testing.T) {
-        req := httptest.NewRequest(http.MethodGet, "/api/groups/user/invalid", nil)
-        resp, _ := app.Test(req)
+		req := httptest.NewRequest(http.MethodGet, "/api/groups/user/"+strconv.Itoa(int(user.ID)), nil)
+		resp, _ := app.Test(req)
 
-        assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-    })
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
 
-    t.Run("non-existent user ID", func(t *testing.T) {
-        req := httptest.NewRequest(http.MethodGet, "/api/groups/user/999999", nil)
-        resp, _ := app.Test(req)
+		var groups []models.Group
+		err := json.NewDecoder(resp.Body).Decode(&groups)
+		if err != nil {
+			t.Fatalf("Failed to decode response body: %v", err)
+		}
 
-        assert.Equal(t, http.StatusOK, resp.StatusCode)
+		assert.Empty(t, groups)
+	})
 
-        var chats []models.Chat
-        err := json.NewDecoder(resp.Body).Decode(&chats)
-        if err != nil {
-            t.Fatalf("Failed to decode response body: %v", err)
-        }
+	t.Run("invalid user ID", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/api/groups/user/invalid", nil)
+		resp, _ := app.Test(req)
 
-        assert.Empty(t, chats)
-    })
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	})
+
+	t.Run("non-existent user ID", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/api/groups/user/999999", nil)
+		resp, _ := app.Test(req)
+
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		var chats []models.Chat
+		err := json.NewDecoder(resp.Body).Decode(&chats)
+		if err != nil {
+			t.Fatalf("Failed to decode response body: %v", err)
+		}
+
+		assert.Empty(t, chats)
+	})
 }
