@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"go.messenger/database"
@@ -11,14 +10,16 @@ import (
 )
 
 func GetUser(c *fiber.Ctx) error {
-	id, err := strconv.Atoi(c.Params("id"))
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid user ID"})
-	}
+	firebaseId := c.Locals("firebaseId")
 
-	user, err := services.GetUser(id)
-	if err != nil {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "User not found"})
+	var user models.User
+
+	result := database.DB.Db.First(&user, "fire_token = ?", firebaseId)
+	fmt.Println("User found:", user)
+
+	if result.Error != nil {
+		fmt.Println("Error finding user:", result.Error)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "User not found"})
 	}
 
 	return c.Status(fiber.StatusOK).JSON(user)
@@ -46,7 +47,6 @@ func UpdateUser(c *fiber.Ctx) error {
 	var user models.User
 
 	result := database.DB.Db.First(&user, "fire_token = ?", firebaseId)
-	fmt.Println("User found:", user)
 
 	if result.Error != nil {
 		fmt.Println("Error finding user:", result.Error)

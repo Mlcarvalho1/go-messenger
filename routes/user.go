@@ -9,7 +9,7 @@ import (
 func UserRoutes(api fiber.Router) {
 	user := api.Group("/users")
 
-	user.Get("/:id", controllers.GetUser)
+	user.Get("/", controllers.GetUser)
 	user.Patch("/", controllers.UpdateUser)
 
 	user.Get("/", controllers.GetUsers)
