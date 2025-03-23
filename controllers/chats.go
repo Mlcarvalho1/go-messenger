@@ -1,20 +1,25 @@
-package controllers 
+package controllers
 
 import (
-	"strconv"
 	"github.com/gofiber/fiber/v2"
+	"go.messenger/database"
+	"go.messenger/models"
 	"go.messenger/services"
 )
 
-func GetChatsByUserID(c *fiber.Ctx) error {
-	userIdStr := c.Params("userId")
-    userId, err := strconv.Atoi(userIdStr)
-    if err != nil {
-        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid user ID"})
-    }
+func GetCurrentUserChats(c *fiber.Ctx) error {
+	firebaseId := c.Locals("firebaseId")
 
-	chats, err := services.GetChatsByUserID(userId)
-	
+	var user models.User
+
+	result := database.DB.Db.First(&user, "fire_token = ?", firebaseId)
+
+	if result.Error != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "User not found"})
+	}
+
+	chats, err := services.GetChatsByUserID(int(user.ID))
+
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Chats not found"})
 	}
