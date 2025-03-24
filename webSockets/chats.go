@@ -1,12 +1,14 @@
 package websockets
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"log"
 	"sync"
 	"time"
 
+	"firebase.google.com/go/auth"
 	"github.com/gofiber/websocket/v2"
 	"go.messenger/database"
 	"go.messenger/models"
@@ -22,32 +24,48 @@ type Message struct {
 }
 
 type WebSocketServer struct {
-	clients   map[uint]*websocket.Conn // Map of userID -> WebSocket connection
-	mu        sync.Mutex               // Mutex to handle concurrent access
-	broadcast chan *Message
+	clients    map[uint]*websocket.Conn
+	mu         sync.Mutex
+	broadcast  chan *Message
+	AuthClient *auth.Client
 }
 
-func NewWebSocket() *WebSocketServer {
+func NewWebSocket(authClient *auth.Client) *WebSocketServer {
 	return &WebSocketServer{
-		clients:   make(map[uint]*websocket.Conn),
-		broadcast: make(chan *Message),
+		clients:    make(map[uint]*websocket.Conn),
+		broadcast:  make(chan *Message),
+		AuthClient: authClient,
 	}
 }
 
 func (s *WebSocketServer) HandleWebSocket(ctx *websocket.Conn) {
-	// Get user Firebase ID from context
-	firebaseId := ctx.Locals("firebaseId")
-
-	var user models.User
-
-	result := database.DB.Db.First(&user, "fire_token = ?", firebaseId)
-	if result.Error != nil {
-		log.Println("Error fetching user")
+	// Recupera o token do query param
+	tokenString := ctx.Query("token")
+	if tokenString == "" {
+		log.Println("Token not provided")
 		ctx.Close()
 		return
 	}
 
-	// Register the user connection
+	// Valida o token com Firebase
+	token, err := s.AuthClient.VerifyIDToken(context.Background(), tokenString)
+	if err != nil {
+		log.Println("Invalid token:", err)
+		ctx.Close()
+		return
+	}
+
+	firebaseId := token.UID
+
+	var user models.User
+	result := database.DB.Db.First(&user, "fire_token = ?", firebaseId)
+	if result.Error != nil {
+		log.Println("Error fetching user from DB:", result.Error)
+		ctx.Close()
+		return
+	}
+
+	// Agora sim: registrando a conexão do usuário autenticado
 	s.mu.Lock()
 	s.clients[user.ID] = ctx
 	s.mu.Unlock()
@@ -59,6 +77,9 @@ func (s *WebSocketServer) HandleWebSocket(ctx *websocket.Conn) {
 		ctx.Close()
 	}()
 
+	log.Printf("User %s connected via WebSocket", user.Name)
+
+	// Loop de leitura de mensagens
 	for {
 		_, msg, err := ctx.ReadMessage()
 		if err != nil {
